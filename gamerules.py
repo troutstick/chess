@@ -28,8 +28,22 @@ class Chessboard:
     def __repr__(self):
         return "Hi. I'm a chessboard."
 
+    def __str__(self):
+        def print_rank(rank):
+            str_output = ""
+            for piece in rank:
+                if piece:
+                    str_output += piece.name
+                else:
+                    str_output += "-"
+            print(str_output)
+
+        for rank_index in range(0, 7, -1):
+            print_rank(self.ranks[rank_index])
+        return ""
+
     def select(self, file_pos, rank_pos):
-        """Return the item in the 1st file and on the 2nd rank like so:
+        """Return the piece in the 1st file and on the 2nd rank like so:
         >>> Chessboard.select("A", 2)
         
         WARNING: File comes before rank here, as is standard in chess notation.
@@ -39,49 +53,85 @@ class Chessboard:
         return self.ranks[rank_index][file_index]
 
     def board_setup(self):
-        def board_setup_helper(home_rank, pawn_rank, is_white):
+        def board_setup_helper(is_white):
             if is_white:
                 home_rank, pawn_rank = 1, 2
             else:
                 home_rank, pawn_rank = 8, 7
-            self.select("A", home_rank) = Rook(is_white)
-            self.select("B", home_rank) = Knight(is_white)
-            self.select("C", home_rank) = Bishop(is_white)
-            self.select("D", home_rank) = Queen(is_white)
-            self.select("E", home_rank) = King(is_white)
-            self.select("F", home_rank) = Bishop(is_white)
-            self.select("G", home_rank) = Knight(is_white)
-            self.select("H", home_rank) = Rook(is_white)
-            self.select("A", pawn_rank) = Pawn(is_white)
-            self.select("B", pawn_rank) = Pawn(is_white)
-            self.select("C", pawn_rank) = Pawn(is_white)
-            self.select("D", pawn_rank) = Pawn(is_white)
-            self.select("E", pawn_rank) = Pawn(is_white)
-            self.select("F", pawn_rank) = Pawn(is_white)
-            self.select("G", pawn_rank) = Pawn(is_white)
-            self.select("H", pawn_rank) = Pawn(is_white)
+            self.add_piece("A", home_rank, Rook(is_white))
+            self.add_piece("B", home_rank, Knight(is_white))
+            self.add_piece("C", home_rank, Bishop(is_white))
+            self.add_piece("D", home_rank, Queen(is_white))
+            self.add_piece("E", home_rank, King(is_white))
+            self.add_piece("F", home_rank, Bishop(is_white))
+            self.add_piece("G", home_rank, Knight(is_white))
+            self.add_piece("H", home_rank, Rook(is_white))
+            self.add_piece("A", pawn_rank, Pawn(is_white))
+            self.add_piece("B", pawn_rank, Pawn(is_white))
+            self.add_piece("C", pawn_rank, Pawn(is_white))
+            self.add_piece("D", pawn_rank, Pawn(is_white))
+            self.add_piece("E", pawn_rank, Pawn(is_white))
+            self.add_piece("F", pawn_rank, Pawn(is_white))
+            self.add_piece("G", pawn_rank, Pawn(is_white))
+            self.add_piece("H", pawn_rank, Pawn(is_white))
         
         board_setup_helper(True)
         board_setup_helper(False)
+
+    def add_piece(self, file_pos, rank_pos, piece):
+        file_index = self.letter_num[file_pos]
+        rank_index = rank_pos - 1
+        self.ranks[rank_index][file_index] = piece
+
+    def move_piece(self, start_file, start_rank, direction, num_squares=0):
+        """Pick a direction and a number of squares to move a piece in.
+        
+        Direction (from white's perspective):
+        0 = ???
+        1 = Up
+        2 = Up-right diagonally
+        3 = Right
+        4 = Down-right diagonally
+        5 = Down
+        6 = Down-left diagonally
+        7 = Left
+        8 = Up-left diagonally
+
+        Numbers + 8: Same but for knight, e.g.
+        9 = Up 2, Right 1
+        """
+        piece = self.select(start_file, start_rank)
+        piece_type = type(piece)
+        piece = None
+        # finish this uwu
+
 
 
 c = Chessboard # TEMPORARY: for easier access
 
 class Piece:
+    name = ""
     """Kings. Queens. Many other pieces. Woo!"""
-    def __init__(self, file_pos, rank_pos, is_white):
-        self.file_pos = file_pos
-        self.rank_pos = rank_pos
+    def __init__(self, is_white):
         self.is_white = is_white # Boolean
 
+    def __repr__(self):
+        return self.name
+
 class King(Piece):
+    name = "K"
 
 class Queen(Piece):
+    name = "Q"
 
 class Bishop(Piece):
+    name = "B"
 
 class Knight(Piece):
+    name = "K"
 
 class Rook(Piece):
+    name = "R"
 
 class Pawn(Piece):
+    name = "1"
