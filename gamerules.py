@@ -38,3 +38,18 @@ class Chessboard:
         return self.ranks[rank_index][file_index]
 
 c = Chessboard # TEMPORARY: for easier access
+
+class Piece:
+    """Kings. Queens. Many other pieces. Woo!"""
+
+class King:
+
+class Queen:
+
+class Bishop:
+
+class Knight:
+
+class Rook:
+
+class Pawn:
