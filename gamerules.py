@@ -23,6 +23,7 @@ class Chessboard:
             for r in range(num_ranks):
                 file.append(None)
             self.ranks.append(file)
+        self.board_setup()
     
     def __repr__(self):
         return "Hi. I'm a chessboard."
@@ -37,19 +38,50 @@ class Chessboard:
         rank_index = rank_pos - 1
         return self.ranks[rank_index][file_index]
 
+    def board_setup(self):
+        def board_setup_helper(home_rank, pawn_rank, is_white):
+            if is_white:
+                home_rank, pawn_rank = 1, 2
+            else:
+                home_rank, pawn_rank = 8, 7
+            self.select("A", home_rank) = Rook(is_white)
+            self.select("B", home_rank) = Knight(is_white)
+            self.select("C", home_rank) = Bishop(is_white)
+            self.select("D", home_rank) = Queen(is_white)
+            self.select("E", home_rank) = King(is_white)
+            self.select("F", home_rank) = Bishop(is_white)
+            self.select("G", home_rank) = Knight(is_white)
+            self.select("H", home_rank) = Rook(is_white)
+            self.select("A", pawn_rank) = Pawn(is_white)
+            self.select("B", pawn_rank) = Pawn(is_white)
+            self.select("C", pawn_rank) = Pawn(is_white)
+            self.select("D", pawn_rank) = Pawn(is_white)
+            self.select("E", pawn_rank) = Pawn(is_white)
+            self.select("F", pawn_rank) = Pawn(is_white)
+            self.select("G", pawn_rank) = Pawn(is_white)
+            self.select("H", pawn_rank) = Pawn(is_white)
+        
+        board_setup_helper(True)
+        board_setup_helper(False)
+
+
 c = Chessboard # TEMPORARY: for easier access
 
 class Piece:
     """Kings. Queens. Many other pieces. Woo!"""
+    def __init__(self, file_pos, rank_pos, is_white):
+        self.file_pos = file_pos
+        self.rank_pos = rank_pos
+        self.is_white = is_white # Boolean
 
-class King:
+class King(Piece):
 
-class Queen:
+class Queen(Piece):
 
-class Bishop:
+class Bishop(Piece):
 
-class Knight:
+class Knight(Piece):
 
-class Rook:
+class Rook(Piece):
 
-class Pawn:
+class Pawn(Piece):
