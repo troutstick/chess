@@ -6,17 +6,18 @@ class Game:
     def __init__(self):
         self.board = board.Chessboard()
         self.white = self.board.white
-        print("White makes a move!")
         self.black = self.board.black
-        print("Black makes a move!")
         self.turn = 0
 
     def sim(self):
         """Play game."""
         try:
+            print("White to move.")
             while True:
                 self.white.play()
+                print("White makes a move!")
                 self.black.play()
+                print("Black makes a move!")
                 self.turn += 1
         except GameOverException:
             print("Game over!")

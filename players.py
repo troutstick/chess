@@ -13,6 +13,10 @@ class Player:
         """Make a move."""
         self.board.list_pieces(self.is_white)
         print(self.board)
+        if self.is_white:
+            print("White to move.")
+        else:
+            print("Black to move.")
         all_legal_moves = self.board.all_moves(self.is_white)
         print("You may move these pieces:")
      
@@ -25,9 +29,20 @@ class Player:
                 piece_str += (str(key_num) + ". " + str(piece) + " | ")
                 select_dict.update({key_num: piece_list})
                 key_num += 1
+        print(piece_str) # display available options to player
+        while True:
+            try:
+                input_num = int(input("Please enter a number to select a piece to move: "))
+                if input_num >= key_num or input_num <= 0:
+                    raise ValueError
+                input_num2 = int(input("Please reenter your choice: "))
+                if input_num == input_num2:
+                    break
+                print("Inputs do not match. Please try again.")
+            except ValueError:
+                print(
+                    f"Invalid input. Please enter a number from 1 through {key_num-1}.")
 
-        print(piece_str)
-        input_num = int(input("Please enter a number to select a piece to move: "))
         piece_move_list = select_dict.get(input_num)
         selected_piece = piece_move_list[0]
         legal_moves = piece_move_list[1:]
@@ -50,11 +65,17 @@ class Player:
             key_num += 1
         print(coord_str)
         while True:
-            input_num1 = int(input("Enter the move you want to make: "))
-            input_num2 = int(input("Please reenter your choice: "))
-            if input_num1 == input_num2:
-                break
-            print("Invalid input. Please try again.")
-        move_vector = select_move_dict.get(input_num1)
+            try:
+                input_num = int(input("Enter the move you want to make: "))
+                if input_num >= key_num or input_num <= 0:
+                    raise ValueError
+                input_num2 = int(input("Please reenter your choice: "))
+                if input_num == input_num2:
+                    break
+                print("Inputs do not match. Please try again.")
+            except ValueError:
+                print(f"Invalid input. Please enter a number from 1 through {key_num-1}.")
+
+        move_vector = select_move_dict.get(input_num)
         direction, step = move_vector[0], move_vector[1]
         self.board.move_piece(start_file, start_rank, direction, step)
