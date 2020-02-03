@@ -86,6 +86,9 @@ class Chessboard:
         """
         file_index = self.letter_num[file_pos]
         rank_index = rank_pos - 1
+        return self.select_index(file_index, rank_index)
+
+    def select_index(self, file_index, rank_index):
         return self.ranks[rank_index][file_index]
 
     def board_setup(self):
@@ -128,7 +131,7 @@ class Chessboard:
         rank_index = rank_pos - 1
         self.add_piece_index(file_index, rank_index, None)
 
-    def move_piece(self, start_file, start_rank, direction, num_squares=1):
+    def move_piece(self, start_file, start_rank, direction, step=1):
         """Pick a direction and a number of squares to move a piece in.
         
         Direction (from white's perspective):
@@ -150,22 +153,35 @@ class Chessboard:
         19 = Pawn up 2 squares
         20 = Pawn down 2 squares
 
-        num_squares represents how far the piece moves.
+        step = how far the piece moves.
         """
         piece = self.select(start_file, start_rank)
         piece_type = type(piece)
         is_white = piece.is_white
 
-        file_index = self.letter_num[start_file]
-        rank_index = start_rank - 1
-        
-        dir_vect = self.dir_vectors[direction]
-        delta_files = dir_vect[0] * num_squares
-        delta_ranks = dir_vect[1] * num_squares
-        file_index += delta_files
-        rank_index += delta_ranks
-        self.add_piece_index(file_index, rank_index, piece_type(is_white)) #add piece at new square
+        new_file, new_rank = self.vect_select_coord(start_file, start_rank, direction, step)
+        new_piece = piece_type(is_white, new_file, new_rank)
+        self.add_piece_index(new_file, new_rank, new_piece) #add piece at new square
         self.remove_piece(start_file, start_rank) #delete piece at old square
+
+    def vect_select(self, start_file, start_rank, direction, step=1):
+        """Selects a piece given starting position, direction vector, and step count."""
+        file_index, rank_index = self.vect_select_coord(start_file, start_rank, direction, step)
+        return self.select_index(file_index, rank_index)
+
+    def vect_select_coord(self, start_file, start_rank, direction, step=1):
+        """Return indices of coordinate given starting coord, direction vect, and step"""
+        start_file_index = self.letter_num[start_file]
+        start_rank_index = start_rank - 1
+        dir_vect = self.dir_vectors[direction]
+
+        delta_files = dir_vect[0] * step
+        delta_ranks = dir_vect[1] * step
+
+        new_file_index = delta_files + start_file_index
+        new_rank_index = delta_ranks + start_rank_index
+        return new_file_index, new_rank_index
+
 
     def list_pieces(self, is_white):
         """Returns a list of pieces for a player."""
@@ -178,7 +194,12 @@ class Chessboard:
 
     def legal_moves(self, piece):
         """Returns a list of valid moves for a piece."""
-        pass
+        step = 1
+        for direction in piece.legal_vect:
+            while step < piece.max_step: # should throw exception to deal with inf ranged pieces
+                if True:
+                    pass # should encounter exceptions to break loop
+                step += 1
 
 c = Chessboard # TEMPORARY: for easier access
 
@@ -189,7 +210,7 @@ class Piece:
         self.is_white = is_white # Boolean
         self.file_pos = file_pos # a, b, c
         self.rank_pos = rank_pos # 1, 2, 3
-        self.pos =  file_pos + str(rank_pos) # e3, d4
+        self.pos =  str(file_pos) + str(rank_pos) # e3, d4
         self.has_moved = False # useful for castling
 
     def __repr__(self):
