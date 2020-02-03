@@ -89,6 +89,8 @@ class Chessboard:
         return self.select_index(file_index, rank_index)
 
     def select_index(self, file_index, rank_index):
+        if file_index < 0 or rank_index < 0:
+            raise IllegalMoveException('no negative files/ranks')
         return self.ranks[rank_index][file_index]
 
     def board_setup(self):
@@ -167,7 +169,7 @@ class Chessboard:
     def vect_select(self, start_file, start_rank, direction, step=1):
         """Selects a piece given starting position, direction vector, and step count."""
         file_index, rank_index = self.vect_select_coord(start_file, start_rank, direction, step)
-        return self.select_index(file_index, rank_index)
+        return self.select_index(file_index, rank_index) # handle out of board exception
 
     def vect_select_coord(self, start_file, start_rank, direction, step=1):
         """Return indices of coordinate given starting coord, direction vect, and step"""
@@ -182,7 +184,6 @@ class Chessboard:
         new_rank_index = delta_ranks + start_rank_index
         return new_file_index, new_rank_index
 
-
     def list_pieces(self, is_white):
         """Returns a list of pieces for a player."""
         pieces = []
@@ -192,16 +193,38 @@ class Chessboard:
                     pieces.append(piece)
         return pieces
 
-    def legal_moves(self, piece):
-        """Returns a list of valid moves for a piece."""
-        step = 1
-        for direction in piece.legal_vect:
-            while step < piece.max_step: # should throw exception to deal with inf ranged pieces
-                if True:
-                    pass # should encounter exceptions to break loop
-                step += 1
+    def same_side(self, piece1, piece2):
+        return piece1.is_white == piece2.is_white
 
-c = Chessboard # TEMPORARY: for easier access
+    def legal_moves(self, this_piece):
+        """Returns a list of valid moves for a piece."""
+
+        if isinstance(this_piece, Pawn):
+            self.legal_pawn_moves(this_piece)
+
+        valid_moves = []
+        for direction in this_piece.legal_vect:
+            step = 1
+            met_opponent = False
+            while step <= this_piece.max_step: # should throw exception to deal with inf ranged pieces
+                try:
+                    if met_opponent:
+                        met_opponent = False
+                        break
+                    
+                    target_piece = self.vect_select(this_piece.file_pos, this_piece.rank_pos, direction, step)
+                    if target_piece:
+                        if self.same_side(this_piece, target_piece):
+                            break
+                        else:
+                            met_opponent = True
+                except IllegalMoveException:
+                    break
+                
+                valid_moves.append((direction, step))
+                step += 1
+        return valid_moves
+
 
 class Piece:
     name = "N/A"
@@ -234,7 +257,7 @@ class Bishop(Piece):
 
 class Knight(Piece):
     name = "N"
-    legal_vect = [list(range(9, 17))]
+    legal_vect = list(range(9, 17))
     max_step = 1
 
 
@@ -252,7 +275,6 @@ class WhitePawn(Pawn):
 
 class BlackPawn(Pawn):
     legal_vect = [4, 5, 6, 20]
-
 
 class IllegalMoveException(Exception):
     pass
