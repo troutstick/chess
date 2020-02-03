@@ -89,7 +89,7 @@ class Chessboard:
         return self.select_index(file_index, rank_index)
 
     def select_index(self, file_index, rank_index):
-        if file_index < 0 or rank_index < 0:
+        if file_index < 0 or rank_index < 0 or file_index > 7 or rank_index > 7:
             raise IllegalMoveException('no negative files/ranks')
         return self.ranks[rank_index][file_index]
 
@@ -220,9 +220,11 @@ class Chessboard:
                         valid_moves.append((direction, 1))
                     
                 except IllegalMoveException:
-                    break
+                    pass
+            
             if not this_piece.has_moved:
                 valid_moves.append((twice_forward, 1))
+
             return valid_moves
 
         if isinstance(this_piece, Pawn):
@@ -251,6 +253,12 @@ class Chessboard:
                     step += 1
             return valid_moves
 
+    def all_moves(self, is_white):
+        """List all legal moves for a player."""
+        moves = []
+        for piece in self.list_pieces(is_white):
+            moves.append([piece] + self.legal_moves(piece))
+        return moves
 
 class Piece:
     name = "N/A"
@@ -295,6 +303,9 @@ class Rook(Piece):
 class Pawn(Piece):
     name = "P"
     max_step = 1
+    def __init__(self, is_white, file_pos, rank_pos, has_moved=False):
+        self.ep_capturable = False
+        super().__init__(is_white, file_pos, rank_pos, has_moved=has_moved)
 
 class WhitePawn(Pawn):
     legal_vect = [1, 2, 8, 19]
@@ -302,5 +313,11 @@ class WhitePawn(Pawn):
 class BlackPawn(Pawn):
     legal_vect = [5, 4, 6, 20] # normal forward, 2 diagonals, forward 2 squares
 
+class EPPawn(Pawn): #used for calculating en passant
+    name = "@"
+    def __init__(self, is_white, file_pos, rank_pos, real_pawn):
+        super().__init__(is_white, file_pos, rank_pos, False)
+        self.real_pawn = real_pawn # if this pawn dies, real pawn dies too
+        
 class IllegalMoveException(Exception):
     pass
