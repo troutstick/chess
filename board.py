@@ -24,10 +24,10 @@ class Chessboard:
         13: (-1, -2),
         14: (-2, -1),
         15: (-2, 1),
-        16: (-1, 2)
-        17: "TODO 0-0"
-        18: "TODO 0-0-0"
-        19: (0, 2)
+        16: (-1, 2),
+        17: "TODO 0-0",
+        18: "TODO 0-0-0",
+        19: (0, 2),
         20: (0, -2)
     }
 
@@ -92,9 +92,9 @@ class Chessboard:
         """Add pieces to the board at game start."""
         def board_setup_helper(is_white):
             if is_white:
-                home_rank, pawn_rank = 1, 2
+                home_rank, pawn_rank, pawn_type = 1, 2, WhitePawn
             else:
-                home_rank, pawn_rank = 8, 7
+                home_rank, pawn_rank, pawn_type = 8, 7, BlackPawn
             self.add_piece("a", home_rank, Rook, is_white)
             self.add_piece("b", home_rank, Knight, is_white)
             self.add_piece("c", home_rank, Bishop, is_white)
@@ -103,14 +103,14 @@ class Chessboard:
             self.add_piece("f", home_rank, Bishop, is_white)
             self.add_piece("g", home_rank, Knight, is_white)
             self.add_piece("h", home_rank, Rook, is_white)
-            self.add_piece("a", pawn_rank, Pawn, is_white)
-            self.add_piece("b", pawn_rank, Pawn, is_white)
-            self.add_piece("c", pawn_rank, Pawn, is_white)
-            self.add_piece("d", pawn_rank, Pawn, is_white)
-            self.add_piece("e", pawn_rank, Pawn, is_white)
-            self.add_piece("f", pawn_rank, Pawn, is_white)
-            self.add_piece("g", pawn_rank, Pawn, is_white)
-            self.add_piece("h", pawn_rank, Pawn, is_white)
+            self.add_piece("a", pawn_rank, pawn_type, is_white)
+            self.add_piece("b", pawn_rank, pawn_type, is_white)
+            self.add_piece("c", pawn_rank, pawn_type, is_white)
+            self.add_piece("d", pawn_rank, pawn_type, is_white)
+            self.add_piece("e", pawn_rank, pawn_type, is_white)
+            self.add_piece("f", pawn_rank, pawn_type, is_white)
+            self.add_piece("g", pawn_rank, pawn_type, is_white)
+            self.add_piece("h", pawn_rank, pawn_type, is_white)
         
         board_setup_helper(True)
         board_setup_helper(False)
@@ -224,8 +224,13 @@ class Rook(Piece):
 
 class Pawn(Piece):
     name = "P"
-    legal_vect = [1, 2, 8, 19, 20]
     max_step = 1
+
+class WhitePawn(Pawn):
+    legal_vect = [1, 2, 8, 19]
+
+class BlackPawn(Pawn):
+    legal_vect = [4, 5, 6, 20]
 
 
 class IllegalMoveException(Exception):
