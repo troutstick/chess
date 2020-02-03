@@ -25,8 +25,8 @@ class Chessboard:
         14: (-2, -1),
         15: (-2, 1),
         16: (-1, 2),
-        17: "TODO 0-0",
-        18: "TODO 0-0-0",
+        17: (2, 0), #Castle kingside
+        18: (-2, 0), #queenside
         19: (0, 2),
         20: (0, -2)
     }
@@ -129,7 +129,7 @@ class Chessboard:
         self.ranks[rank_index][file_index] = piece
 
     def remove_piece(self, file_pos, rank_pos):
-        file_index = self.letter_num[file_pos]
+        file_index = self.letter_num.get(file_pos)
         rank_index = rank_pos - 1
         self.add_piece_index(file_index, rank_index, None)
 
@@ -161,6 +161,12 @@ class Chessboard:
         new_file_index = delta_files + start_file_index
         new_rank_index = delta_ranks + start_rank_index
         return new_file_index, new_rank_index
+
+    def index_to_coord(self, file_index, rank_index):
+        assert 0 <= file_index < 8, "invalid file index"
+        assert 0 <= rank_index < 8, "invalid rank index"
+        file_str = self.letter_num.get(file_index)
+        rank_str = str(rank_index + 1)
 
 
     """Direction (from white's perspective):
