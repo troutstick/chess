@@ -21,3 +21,16 @@ why use an optimized and functional library when you can not??? in short: here i
 ```
   
 anyways, this is basically the next stockfish
+
+### Update: added basic moves from cmd line; here's the first few moves of the sicilian!
+```
+  _a__b__c__d__e__f__g__h_
+8| R  -  B  Q  K  B  N  R |
+7| P  P  -  P  P  P  P  P |
+6| -  -  N  -  -  -  -  - |
+5| -  -  -  -  -  -  -  - |
+4| -  -  - (N)(P) -  -  - |
+3| -  -  -  -  -  -  -  - |
+2|(P)(P)(P) -  - (P)(P)(P)|
+1|(R)(N)(B)(Q)(K)(B) - (R)|
+```
