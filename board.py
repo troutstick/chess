@@ -134,35 +134,13 @@ class Chessboard:
         self.add_piece_index(file_index, rank_index, None)
 
     def move_piece(self, start_file, start_rank, direction, step=1):
-        """Pick a direction and a number of squares to move a piece in.
-        
-        Direction (from white's perspective):
-        0 = ???
-        1 = Up
-        2 = Up-right diagonally
-        3 = Right
-        4 = Down-right diagonally
-        5 = Down
-        6 = Down-left diagonally
-        7 = Left
-        8 = Up-left diagonally
-
-        Numbers + 8: Same but for knight, e.g.
-        9 = Up 2, Right 1
-
-        17 = Kingside castling
-        18 = Queenside castling
-        19 = Pawn up 2 squares
-        20 = Pawn down 2 squares
-
-        step = how far the piece moves.
-        """
+        """Pick a direction and a number of squares to move a piece in."""
         piece = self.select(start_file, start_rank)
         piece_type = type(piece)
         is_white = piece.is_white
 
         new_file, new_rank = self.vect_select_coord(start_file, start_rank, direction, step)
-        new_piece = piece_type(is_white, new_file, new_rank)
+        new_piece = piece_type(is_white, new_file, new_rank, True)
         self.add_piece_index(new_file, new_rank, new_piece) #add piece at new square
         self.remove_piece(start_file, start_rank) #delete piece at old square
 
@@ -184,6 +162,29 @@ class Chessboard:
         new_rank_index = delta_ranks + start_rank_index
         return new_file_index, new_rank_index
 
+
+    """Direction (from white's perspective):
+    0 = ???
+    1 = Up
+    2 = Up-right diagonally
+    3 = Right
+    4 = Down-right diagonally
+    5 = Down
+    6 = Down-left diagonally
+    7 = Left
+    8 = Up-left diagonally
+
+    Numbers + 8: Same but for knight, e.g.
+    9 = Up 2, Right 1
+
+    17 = Kingside castling
+    18 = Queenside castling
+    19 = Pawn up 2 squares
+    20 = Pawn down 2 squares
+
+    step = how far the piece moves.
+    """
+
     def list_pieces(self, is_white):
         """Returns a list of pieces for a player."""
         pieces = []
@@ -198,43 +199,68 @@ class Chessboard:
 
     def legal_moves(self, this_piece):
         """Returns a list of valid moves for a piece."""
+        
+        def legal_pawn_moves(this_piece):
+            """Still need to do en passant. Ew."""
+            valid_moves = []
+            forward = this_piece.legal_vect[0]
+            twice_forward = this_piece.legal_vect[3]
+            diagonals = this_piece.legal_vect[1:3]
 
-        if isinstance(this_piece, Pawn):
-            self.legal_pawn_moves(this_piece)
+            target_piece = self.vect_select(
+                this_piece.file_pos, this_piece.rank_pos, forward)
+            if not target_piece:
+                valid_moves.append((forward, 1))
 
-        valid_moves = []
-        for direction in this_piece.legal_vect:
-            step = 1
-            met_opponent = False
-            while step <= this_piece.max_step: # should throw exception to deal with inf ranged pieces
+            for direction in diagonals:
                 try:
-                    if met_opponent:
-                        met_opponent = False
-                        break
+                    target_piece = self.vect_select(
+                        this_piece.file_pos, this_piece.rank_pos, direction)
+                    if target_piece and (not self.same_side(this_piece, target_piece)):
+                        valid_moves.append((direction, 1))
                     
-                    target_piece = self.vect_select(this_piece.file_pos, this_piece.rank_pos, direction, step)
-                    if target_piece:
-                        if self.same_side(this_piece, target_piece):
-                            break
-                        else:
-                            met_opponent = True
                 except IllegalMoveException:
                     break
-                
-                valid_moves.append((direction, step))
-                step += 1
-        return valid_moves
+            if not this_piece.has_moved:
+                valid_moves.append((twice_forward, 1))
+            return valid_moves
+
+        if isinstance(this_piece, Pawn):
+            return legal_pawn_moves(this_piece)
+        else:
+            valid_moves = []
+            for direction in this_piece.legal_vect:
+                step = 1
+                met_opponent = False
+                while step <= this_piece.max_step: # should throw exception to deal with inf ranged pieces
+                    try:
+                        if met_opponent:
+                            met_opponent = False
+                            break
+                        
+                        target_piece = self.vect_select(this_piece.file_pos, this_piece.rank_pos, direction, step)
+                        if target_piece:
+                            if self.same_side(this_piece, target_piece):
+                                break
+                            else:
+                                met_opponent = True
+                    except IllegalMoveException:
+                        break
+                    
+                    valid_moves.append((direction, step))
+                    step += 1
+            return valid_moves
 
 
 class Piece:
     name = "N/A"
     """Kings. Queens. Many other pieces. Woo!"""
-    def __init__(self, is_white, file_pos, rank_pos):
+    def __init__(self, is_white, file_pos, rank_pos, has_moved=False):
         self.is_white = is_white # Boolean
         self.file_pos = file_pos # a, b, c
         self.rank_pos = rank_pos # 1, 2, 3
         self.pos =  str(file_pos) + str(rank_pos) # e3, d4
-        self.has_moved = False # useful for castling
+        self.has_moved = has_moved # useful for castling
 
     def __repr__(self):
         return self.name + "@" + self.pos
@@ -274,7 +300,7 @@ class WhitePawn(Pawn):
     legal_vect = [1, 2, 8, 19]
 
 class BlackPawn(Pawn):
-    legal_vect = [4, 5, 6, 20]
+    legal_vect = [5, 4, 6, 20] # normal forward, 2 diagonals, forward 2 squares
 
 class IllegalMoveException(Exception):
     pass
