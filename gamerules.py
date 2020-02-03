@@ -33,12 +33,17 @@ class Chessboard:
             str_output = ""
             for piece in rank:
                 if piece:
-                    str_output += piece.name
+                    if piece.is_white:
+                        str_output += ("(" + piece.name + ")")
+                    else:
+                        str_output += (" " + piece.name + " ")
+                        
                 else:
-                    str_output += "-"
+                    str_output += " - "
+                str_output += ""
             print(str_output)
 
-        for rank_index in range(0, 7, -1):
+        for rank_index in range(7, -1, -1):
             print_rank(self.ranks[rank_index])
         return ""
 
@@ -128,10 +133,10 @@ class Bishop(Piece):
     name = "B"
 
 class Knight(Piece):
-    name = "K"
+    name = "N"
 
 class Rook(Piece):
     name = "R"
 
 class Pawn(Piece):
-    name = "1"
+    name = "P"
