@@ -6,6 +6,25 @@ class Chessboard:
     Each rank is itself a list of files (columns).
     Together they correspond to a coordinate on the board.
     """
+    dir_vectors = { # for handling piece moves
+        1: (0, 1),
+        2: (1, 1),
+        3: (1, 0),
+        4: (1, -1),
+        5: (0, -1),
+        6: (-1, -1),
+        7: (-1, 0),
+        8: (-1, 1),
+        9: (1, 2),
+        10: (2, 1),
+        11: (2, -1),
+        12: (1, -2),
+        13: (-1, -2),
+        14: (-2, -1),
+        15: (-2, 1),
+        16: (-1, 2)
+    }
+
     letter_num = {
         "A": 0,
         "B": 1,
@@ -26,25 +45,28 @@ class Chessboard:
         self.board_setup()
     
     def __repr__(self):
-        return "Hi. I'm a chessboard."
-
-    def __str__(self):
-        def print_rank(rank):
+        def print_rank(rank_index):
+            rank = self.ranks[rank_index]
             str_output = ""
+            light_sq = True
             for piece in rank:
                 if piece:
                     if piece.is_white:
                         str_output += ("(" + piece.name + ")")
                     else:
                         str_output += (" " + piece.name + " ")
-                        
+                elif (rank_index % 2 and light_sq) or ((not rank_index % 2) and (not light_sq)):
+                    str_output += " - " #can be used to change appearance of light squares
                 else:
                     str_output += " - "
+                light_sq = not light_sq
                 str_output += ""
-            print(str_output)
+            print(str_output + '|')
 
+        print("  _a__b__c__d__e__f__g__h_")
         for rank_index in range(7, -1, -1):
-            print_rank(self.ranks[rank_index])
+            print(rank_index + 1, end='|')
+            print_rank(rank_index)
         return ""
 
     def select(self, file_pos, rank_pos):
@@ -86,9 +108,15 @@ class Chessboard:
     def add_piece(self, file_pos, rank_pos, piece):
         file_index = self.letter_num[file_pos]
         rank_index = rank_pos - 1
+        self.add_piece_index(file_index, rank_index, piece)
+
+    def add_piece_index(self, file_index, rank_index, piece):
         self.ranks[rank_index][file_index] = piece
 
-    def move_piece(self, start_file, start_rank, direction, num_squares=0):
+    def remove_piece(self, file_pos, rank_pos):
+        self.add_piece(file_pos, rank_pos, None)
+
+    def move_piece(self, start_file, start_rank, direction, num_squares=1):
         """Pick a direction and a number of squares to move a piece in.
         
         Direction (from white's perspective):
@@ -104,12 +132,23 @@ class Chessboard:
 
         Numbers + 8: Same but for knight, e.g.
         9 = Up 2, Right 1
+
+        num_squares represents how far the piece moves, and is not needed for knight.
         """
         piece = self.select(start_file, start_rank)
         piece_type = type(piece)
-        piece = None
-        # finish this uwu
+        is_white = piece.is_white
 
+        file_index = self.letter_num[start_file]
+        rank_index = start_rank - 1
+        
+        dir_vect = self.dir_vectors[direction]
+        delta_files = dir_vect[0] * num_squares
+        delta_ranks = dir_vect[1] * num_squares
+        file_index += delta_files
+        rank_index += delta_ranks
+        self.add_piece_index(file_index, rank_index, piece_type(is_white))
+        self.remove_piece(start_file, start_rank)
 
 
 c = Chessboard # TEMPORARY: for easier access
