@@ -25,17 +25,21 @@ class Chessboard:
         14: (-2, -1),
         15: (-2, 1),
         16: (-1, 2)
+        17: "TODO 0-0"
+        18: "TODO 0-0-0"
+        19: (0, 2)
+        20: (0, -2)
     }
 
     letter_num = {
-        "A": 0,
-        "B": 1,
-        "C": 2,
-        "D": 3,
-        "E": 4,
-        "F": 5,
-        "G": 6,
-        "H": 7
+        "a": 0,
+        "b": 1,
+        "c": 2,
+        "d": 3,
+        "e": 4,
+        "f": 5,
+        "g": 6,
+        "h": 7
     }
     def __init__(self, num_ranks=8, num_files=8):
         self.ranks = []
@@ -91,22 +95,22 @@ class Chessboard:
                 home_rank, pawn_rank = 1, 2
             else:
                 home_rank, pawn_rank = 8, 7
-            self.add_piece("A", home_rank, Rook, is_white)
-            self.add_piece("B", home_rank, Knight, is_white)
-            self.add_piece("C", home_rank, Bishop, is_white)
-            self.add_piece("D", home_rank, Queen, is_white)
-            self.add_piece("E", home_rank, King, is_white)
-            self.add_piece("F", home_rank, Bishop, is_white)
-            self.add_piece("G", home_rank, Knight, is_white)
-            self.add_piece("H", home_rank, Rook, is_white)
-            self.add_piece("A", pawn_rank, Pawn, is_white)
-            self.add_piece("B", pawn_rank, Pawn, is_white)
-            self.add_piece("C", pawn_rank, Pawn, is_white)
-            self.add_piece("D", pawn_rank, Pawn, is_white)
-            self.add_piece("E", pawn_rank, Pawn, is_white)
-            self.add_piece("F", pawn_rank, Pawn, is_white)
-            self.add_piece("G", pawn_rank, Pawn, is_white)
-            self.add_piece("H", pawn_rank, Pawn, is_white)
+            self.add_piece("a", home_rank, Rook, is_white)
+            self.add_piece("b", home_rank, Knight, is_white)
+            self.add_piece("c", home_rank, Bishop, is_white)
+            self.add_piece("d", home_rank, Queen, is_white)
+            self.add_piece("e", home_rank, King, is_white)
+            self.add_piece("f", home_rank, Bishop, is_white)
+            self.add_piece("g", home_rank, Knight, is_white)
+            self.add_piece("h", home_rank, Rook, is_white)
+            self.add_piece("a", pawn_rank, Pawn, is_white)
+            self.add_piece("b", pawn_rank, Pawn, is_white)
+            self.add_piece("c", pawn_rank, Pawn, is_white)
+            self.add_piece("d", pawn_rank, Pawn, is_white)
+            self.add_piece("e", pawn_rank, Pawn, is_white)
+            self.add_piece("f", pawn_rank, Pawn, is_white)
+            self.add_piece("g", pawn_rank, Pawn, is_white)
+            self.add_piece("h", pawn_rank, Pawn, is_white)
         
         board_setup_helper(True)
         board_setup_helper(False)
@@ -114,7 +118,7 @@ class Chessboard:
     def add_piece(self, file_pos, rank_pos, piece_type, is_white):
         file_index = self.letter_num[file_pos]
         rank_index = rank_pos - 1
-        self.add_piece_index(file_index, rank_index, piece_type(is_white))
+        self.add_piece_index(file_index, rank_index, piece_type(is_white, file_pos, rank_pos))
 
     def add_piece_index(self, file_index, rank_index, piece):
         self.ranks[rank_index][file_index] = piece
@@ -141,7 +145,12 @@ class Chessboard:
         Numbers + 8: Same but for knight, e.g.
         9 = Up 2, Right 1
 
-        num_squares represents how far the piece moves, and is not needed for knight.
+        17 = Kingside castling
+        18 = Queenside castling
+        19 = Pawn up 2 squares
+        20 = Pawn down 2 squares
+
+        num_squares represents how far the piece moves.
         """
         piece = self.select(start_file, start_rank)
         piece_type = type(piece)
@@ -155,40 +164,69 @@ class Chessboard:
         delta_ranks = dir_vect[1] * num_squares
         file_index += delta_files
         rank_index += delta_ranks
-        self.add_piece_index(file_index, rank_index, piece_type(is_white))
-        self.remove_piece(start_file, start_rank)
+        self.add_piece_index(file_index, rank_index, piece_type(is_white)) #add piece at new square
+        self.remove_piece(start_file, start_rank) #delete piece at old square
 
     def list_pieces(self, is_white):
-        """Returns a list of pieces for a player and their positions on the board."""
+        """Returns a list of pieces for a player."""
+        pieces = []
         for rank in self.ranks:
-            return
+            for piece in rank:
+                if piece and is_white == piece.is_white: # if piece is owned by your side
+                    pieces.append(piece)
+        return pieces
 
+    def legal_moves(self, piece):
+        """Returns a list of valid moves for a piece."""
+        pass
 
 c = Chessboard # TEMPORARY: for easier access
 
 class Piece:
     name = "N/A"
     """Kings. Queens. Many other pieces. Woo!"""
-    def __init__(self, is_white):
+    def __init__(self, is_white, file_pos, rank_pos):
         self.is_white = is_white # Boolean
+        self.file_pos = file_pos # a, b, c
+        self.rank_pos = rank_pos # 1, 2, 3
+        self.pos =  file_pos + str(rank_pos) # e3, d4
+        self.has_moved = False # useful for castling
 
     def __repr__(self):
-        return self.name
+        return self.name + "@" + self.pos
 
 class King(Piece):
     name = "K"
+    legal_vect = list(range(1, 9)) # 8 directions it can move
+    max_step = 1
 
 class Queen(Piece):
     name = "Q"
+    legal_vect = list(range(1, 9))
+    max_step = float("inf")
 
 class Bishop(Piece):
     name = "B"
+    legal_vect = [2, 4, 6, 8]
+    max_step = float("inf")
+
 
 class Knight(Piece):
     name = "N"
+    legal_vect = [list(range(9, 17))]
+    max_step = 1
+
 
 class Rook(Piece):
     name = "R"
+    legal_vect = [1, 3, 5, 7]
+    max_step = float("inf")
 
 class Pawn(Piece):
     name = "P"
+    legal_vect = [1, 2, 8, 19, 20]
+    max_step = 1
+
+
+class IllegalMoveException(Exception):
+    pass
