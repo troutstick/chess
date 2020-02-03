@@ -41,6 +41,8 @@ class Chessboard:
         "g": 6,
         "h": 7
     }
+    num_letter = {v: k for k, v in letter_num.items()}
+
     def __init__(self, num_ranks=8, num_files=8):
         self.ranks = []
         for f in range(num_files):
@@ -139,9 +141,12 @@ class Chessboard:
         piece_type = type(piece)
         is_white = piece.is_white
 
-        new_file, new_rank = self.vect_select_coord(start_file, start_rank, direction, step)
+        new_file_index, new_rank_index = self.vect_select_coord(start_file, start_rank, direction, step)
+        coord = self.index_to_coord(new_file_index, new_rank_index)
+        new_file = coord[0]
+        new_rank = int(coord[1])
         new_piece = piece_type(is_white, new_file, new_rank, True)
-        self.add_piece_index(new_file, new_rank, new_piece) #add piece at new square
+        self.add_piece_index(new_file_index, new_rank_index, new_piece) #add piece at new square
         self.remove_piece(start_file, start_rank) #delete piece at old square
 
     def vect_select(self, start_file, start_rank, direction, step=1):
@@ -151,6 +156,8 @@ class Chessboard:
 
     def vect_select_coord(self, start_file, start_rank, direction, step=1):
         """Return indices of coordinate given starting coord, direction vect, and step"""
+        assert isinstance(start_file, str), "file must be given as str"
+        assert 0 < start_rank < 9, "must have valid rank from 1 and 8"
         start_file_index = self.letter_num[start_file]
         start_rank_index = start_rank - 1
         dir_vect = self.dir_vectors[direction]
@@ -165,8 +172,9 @@ class Chessboard:
     def index_to_coord(self, file_index, rank_index):
         assert 0 <= file_index < 8, "invalid file index"
         assert 0 <= rank_index < 8, "invalid rank index"
-        file_str = self.letter_num.get(file_index)
+        file_str = self.num_letter.get(file_index)
         rank_str = str(rank_index + 1)
+        return file_str + rank_str
 
 
     """Direction (from white's perspective):
@@ -212,7 +220,6 @@ class Chessboard:
             forward = this_piece.legal_vect[0]
             twice_forward = this_piece.legal_vect[3]
             diagonals = this_piece.legal_vect[1:3]
-
             target_piece = self.vect_select(
                 this_piece.file_pos, this_piece.rank_pos, forward)
             if not target_piece:
