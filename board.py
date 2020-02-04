@@ -9,15 +9,15 @@ class Chessboard:
     Together they correspond to a coordinate on the board.
     """
     dir_vectors = { # for handling piece moves
-        1: (0, 1),
+        1: (0, 1), #up
         2: (1, 1),
-        3: (1, 0),
+        3: (1, 0), #right
         4: (1, -1),
-        5: (0, -1),
+        5: (0, -1), #down
         6: (-1, -1),
-        7: (-1, 0),
+        7: (-1, 0), #left
         8: (-1, 1),
-        9: (1, 2),
+        9: (1, 2), #knight 1 o'clock
         10: (2, 1),
         11: (2, -1),
         12: (1, -2),
@@ -27,8 +27,8 @@ class Chessboard:
         16: (-1, 2),
         17: (2, 0), #Castle kingside
         18: (-2, 0), #queenside
-        19: (0, 2),
-        20: (0, -2)
+        19: (0, 2), #pawn up 2
+        20: (0, -2) #pawn down 2
     }
 
     letter_num = {
