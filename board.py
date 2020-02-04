@@ -86,6 +86,39 @@ class Chessboard:
             print_rank(rank_index)
         return ""
 
+    def move_notation(self, piece, move_vector):
+        """Given a piece and its move vector (consisting of direction and step),
+        print move notation i.e. Qxh4.
+        """
+        def capture_str_helper(dest_str):
+            """Returns x if capture."""
+            if self.select(dest_str[0], int(dest_str[1])):  # if there's a piece at a given coordinate
+                if isinstance(piece, Pawn):
+                    capture_str = piece.file_pos + "x"
+                else:
+                    capture_str = "x"
+            else:
+                capture_str = ""
+            return capture_str
+
+        def name_str_helper(piece):
+            if isinstance(piece, Pawn):
+                name_str = ""
+            else:
+                name_str = piece.short_name
+            return name_str
+
+        direction, step = move_vector[0], move_vector[1]
+        start_file, start_rank = piece.file_pos, piece.rank_pos
+        file_index, rank_index = self.vect_select_coord(
+            start_file, start_rank, direction, step)
+
+        dest_str = self.index_to_coord(file_index, rank_index)
+        capture_str = capture_str_helper(dest_str)
+        name_str = name_str_helper(piece)
+
+        return name_str + capture_str + dest_str
+
     def select(self, file_pos, rank_pos):
         """Return the piece in the 1st file and on the 2nd rank like so:
         >>> Chessboard.select("a", 2)

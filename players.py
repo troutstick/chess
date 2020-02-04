@@ -84,7 +84,6 @@ class Player:
                 print("Returning.")
 
 
-
     def play_piece(self, piece, piece_moves):
         """Takes input for a piece to choose a particular move and moves it accordingly."""
         start_file, start_rank = piece.file_pos, piece.rank_pos
@@ -92,24 +91,8 @@ class Player:
         select_move_dict = {}
         key_num = 1
         for move_vector in piece_moves:
-            direction = move_vector[0]
-            step = move_vector[1]
-            file_index, rank_index = self.board.vect_select_coord(start_file, start_rank, direction, step)
-            dest_str = self.board.index_to_coord(file_index, rank_index)
-
-            if self.board.select(dest_str[0], int(dest_str[1])): # if move will make a capture
-                if isinstance(piece, board.Pawn):
-                    capture_str = piece.file_pos + "x"
-                else:
-                    capture_str = "x"
-            else:
-                capture_str = ""
-
-            if isinstance(piece, board.Pawn):
-                name_str = ""
-            else:
-                name_str = piece.name
-            coord_str += (str(key_num) + ". " + name_str + capture_str + dest_str + " | ") #print move notation i.e. Qxh4
+            move_notation_str = self.board.move_notation(piece, move_vector)
+            coord_str += (str(key_num) + ". " + move_notation_str + " | ") 
             select_move_dict.update({key_num: move_vector})
             key_num += 1
         while True:
