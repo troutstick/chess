@@ -34,3 +34,11 @@ anyways, this is basically the next stockfish
 2|(P)(P)(P) -  - (P)(P)(P)|
 1|(R)(N)(B)(Q)(K)(B) - (R)|
 ```
+### To-do
+* Add move history
+
+* Add castling
+
+* Add check, 50mr, checkmate, stalemate, 3fold
+
+* Maybe add resigning or something
