@@ -82,7 +82,7 @@ class Chessboard:
 
     def select(self, file_pos, rank_pos):
         """Return the piece in the 1st file and on the 2nd rank like so:
-        >>> Chessboard.select("A", 2)
+        >>> Chessboard.select("a", 2)
         
         WARNING: File comes before rank here, as is standard in chess notation.
         """
@@ -274,8 +274,17 @@ class Chessboard:
         return moves
 
 class Piece:
-    name = "N/A"
     """Kings. Queens. Many other pieces. Woo!"""
+    name = "N/A"
+    piece_dict = {
+        1: "K",
+        2: "Q",
+        3: "R",
+        4: "B",
+        5: "N",
+        0: "P"
+    }
+
     def __init__(self, is_white, file_pos, rank_pos, has_moved=False):
         self.is_white = is_white # Boolean
         self.file_pos = file_pos # a, b, c
@@ -328,6 +337,7 @@ class BlackPawn(Pawn):
 
 class EPPawn(Pawn): #used for calculating en passant
     name = "@"
+    legal_vect = []
     def __init__(self, is_white, file_pos, rank_pos, real_pawn):
         super().__init__(is_white, file_pos, rank_pos, False)
         self.real_pawn = real_pawn # if this pawn dies, real pawn dies too
