@@ -79,6 +79,7 @@ class Player:
                 legal_moves = piece_move_list[1:]
                 self.play_piece(selected_piece, legal_moves)
                 has_moved = True
+                self.board.remove_eppawn(not self.is_white) # remove opponent's virtual en passant pawns
             except ReturnException:
                 print("Returning.")
 

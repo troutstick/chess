@@ -135,17 +135,42 @@ class Chessboard:
         rank_index = rank_pos - 1
         self.add_piece_index(file_index, rank_index, None)
 
+    def remove_eppawn(self, is_white):
+        for rank in self.ranks:
+            for piece in rank:
+                if isinstance(piece, EPPawn) and piece.is_white == is_white:
+                    self.remove_piece(piece.file_pos, piece.rank_pos)
+
     def move_piece(self, start_file, start_rank, direction, step=1):
         """Pick a direction and a number of squares to move a piece in."""
         piece = self.select(start_file, start_rank)
         piece_type = type(piece)
         is_white = piece.is_white
 
+
         new_file_index, new_rank_index = self.vect_select_coord(start_file, start_rank, direction, step)
         coord = self.index_to_coord(new_file_index, new_rank_index)
         new_file = coord[0]
         new_rank = int(coord[1])
         new_piece = piece_type(is_white, new_file, new_rank, True)
+
+        if isinstance(piece, Pawn):
+            target_piece = self.vect_select(
+                start_file, start_rank, direction, step)
+            if isinstance(target_piece, EPPawn):
+                pawn = target_piece.real_pawn
+                self.remove_piece(pawn.file_pos, pawn.rank_pos)
+
+        if direction == 19 or direction == 20: #en passant
+            if direction == 19:
+                eppawn_dir = 1
+            else:
+                eppawn_dir = 5
+            self.add_piece(start_file, start_rank, EPPawn, is_white)
+            self.move_piece(start_file, start_rank, eppawn_dir)
+            eppawn = self.vect_select(start_file, start_rank, eppawn_dir)
+            eppawn.real_pawn = new_piece
+
         self.add_piece_index(new_file_index, new_rank_index, new_piece) #add piece at new square
         self.remove_piece(start_file, start_rank) #delete piece at old square
 
@@ -215,28 +240,29 @@ class Chessboard:
         """Returns a list of valid moves for a piece."""
         
         def legal_pawn_moves(this_piece):
-            """Still need to do en passant. Ew."""
+            """En passant. Among other things. Ew."""
             valid_moves = []
-            forward = this_piece.legal_vect[0]
-            twice_forward = this_piece.legal_vect[3]
-            diagonals = this_piece.legal_vect[1:3]
-            target_piece = self.vect_select(
-                this_piece.file_pos, this_piece.rank_pos, forward)
-            if not target_piece:
-                valid_moves.append((forward, 1))
+            if not isinstance(this_piece, EPPawn):
+                forward = this_piece.legal_vect[0]
+                twice_forward = this_piece.legal_vect[3]
+                diagonals = this_piece.legal_vect[1:3]
+                target_piece = self.vect_select(
+                    this_piece.file_pos, this_piece.rank_pos, forward)
+                if not target_piece:
+                    valid_moves.append((forward, 1))
 
-            for direction in diagonals:
-                try:
-                    target_piece = self.vect_select(
-                        this_piece.file_pos, this_piece.rank_pos, direction)
-                    if target_piece and (not self.same_side(this_piece, target_piece)):
-                        valid_moves.append((direction, 1))
-                    
-                except IllegalMoveException:
-                    pass
-            
-            if not this_piece.has_moved:
-                valid_moves.append((twice_forward, 1))
+                for direction in diagonals:
+                    try:
+                        target_piece = self.vect_select(
+                            this_piece.file_pos, this_piece.rank_pos, direction)
+                        if target_piece and (not self.same_side(this_piece, target_piece)):
+                            valid_moves.append((direction, 1))
+                        
+                    except IllegalMoveException:
+                        pass
+                
+                if not this_piece.has_moved:
+                    valid_moves.append((twice_forward, 1))
 
             return valid_moves
 
@@ -325,9 +351,6 @@ class Rook(Piece):
 class Pawn(Piece):
     name = "P"
     max_step = 1
-    def __init__(self, is_white, file_pos, rank_pos, has_moved=False):
-        self.ep_capturable = False
-        super().__init__(is_white, file_pos, rank_pos, has_moved=has_moved)
 
 class WhitePawn(Pawn):
     legal_vect = [1, 2, 8, 19]
@@ -338,9 +361,7 @@ class BlackPawn(Pawn):
 class EPPawn(Pawn): #used for calculating en passant
     name = "@"
     legal_vect = []
-    def __init__(self, is_white, file_pos, rank_pos, real_pawn):
-        super().__init__(is_white, file_pos, rank_pos, False)
-        self.real_pawn = real_pawn # if this pawn dies, real pawn dies too
+    real_pawn = None # if this pawn dies, real pawn dies too
         
 class IllegalMoveException(Exception):
     pass
