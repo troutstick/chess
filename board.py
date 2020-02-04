@@ -41,7 +41,7 @@ class Chessboard:
         "g": 6,
         "h": 7
     }
-    num_letter = {v: k for k, v in letter_num.items()}
+    num_letter = {v: k for k, v in letter_num.items()} #inverse of letter_num
 
     def __init__(self, num_ranks=8, num_files=8):
         self.ranks = []
@@ -56,21 +56,27 @@ class Chessboard:
 
     
     def __repr__(self):
+        """With self.ranks as input, print out the board (can only do from white's perspective as of now)."""
+
+        display_eppawn = False
+        light_sq_str = " - "
+        dark_sq_str = " - "
+
         def print_rank(rank_index):
             rank = self.ranks[rank_index]
             str_output = ""
-            light_sq = True
+            light_sq_bool = True
             for piece in rank:
-                if piece:
+                if (piece and not isinstance(piece, EPPawn)) or (display_eppawn and piece):
                     if piece.is_white:
-                        str_output += ("(" + piece.name + ")")
+                        str_output += ("(" + piece.short_name + ")")
                     else:
-                        str_output += (" " + piece.name + " ")
-                elif (rank_index % 2 and light_sq) or ((not rank_index % 2) and (not light_sq)):
-                    str_output += " - " #can be used to change appearance of light squares
+                        str_output += (" " + piece.short_name + " ")
+                elif (rank_index % 2 and light_sq_bool) or ((not rank_index % 2) and (not light_sq_bool)):
+                    str_output += light_sq_str #can be used to change appearance of light squares
                 else:
-                    str_output += " - "
-                light_sq = not light_sq
+                    str_output += dark_sq_str
+                light_sq_bool = not light_sq_bool
                 str_output += ""
             print(str_output + '|')
 
@@ -119,8 +125,8 @@ class Chessboard:
             self.add_piece("g", pawn_rank, pawn_type, is_white)
             self.add_piece("h", pawn_rank, pawn_type, is_white)
         
-        board_setup_helper(True)
-        board_setup_helper(False)
+        board_setup_helper(True) #do white
+        board_setup_helper(False) #do black
 
     def add_piece(self, file_pos, rank_pos, piece_type, is_white):
         file_index = self.letter_num[file_pos]
@@ -136,6 +142,7 @@ class Chessboard:
         self.add_piece_index(file_index, rank_index, None)
 
     def remove_eppawn(self, is_white):
+        """Remove any virtual en passant pawns for a certain player."""
         for rank in self.ranks:
             for piece in rank:
                 if isinstance(piece, EPPawn) and piece.is_white == is_white:
@@ -301,14 +308,15 @@ class Chessboard:
 
 class Piece:
     """Kings. Queens. Many other pieces. Woo!"""
+    short_name = "N/A"
     name = "N/A"
     piece_dict = {
-        1: "K",
-        2: "Q",
-        3: "R",
-        4: "B",
-        5: "N",
-        0: "P"
+        1: "King",
+        2: "Queen",
+        3: "Rook",
+        4: "Bishop",
+        5: "Knight",
+        0: "Pawn"
     }
 
     def __init__(self, is_white, file_pos, rank_pos, has_moved=False):
@@ -319,47 +327,54 @@ class Piece:
         self.has_moved = has_moved # useful for castling
 
     def __repr__(self):
-        return self.name + "@" + self.pos
+        return self.name + " at " + self.pos
 
 class King(Piece):
-    name = "K"
+    short_name = "K"
+    name = "King"
     legal_vect = list(range(1, 9)) # 8 directions it can move
     max_step = 1
 
 class Queen(Piece):
-    name = "Q"
+    short_name = "Q"
+    name = "Queen"
     legal_vect = list(range(1, 9))
     max_step = float("inf")
 
 class Bishop(Piece):
-    name = "B"
+    short_name = "B"
+    name = "Bishop"
     legal_vect = [2, 4, 6, 8]
     max_step = float("inf")
 
 
 class Knight(Piece):
-    name = "N"
+    short_name = "N"
+    name = "Knight"
     legal_vect = list(range(9, 17))
     max_step = 1
 
 
 class Rook(Piece):
-    name = "R"
+    short_name = "R"
+    name = "Rook"
     legal_vect = [1, 3, 5, 7]
     max_step = float("inf")
 
 class Pawn(Piece):
-    name = "P"
+    short_name = "P"
+    name = "Pawn"
     max_step = 1
 
 class WhitePawn(Pawn):
     legal_vect = [1, 2, 8, 19]
 
 class BlackPawn(Pawn):
-    legal_vect = [5, 4, 6, 20] # normal forward, 2 diagonals, forward 2 squares
+    legal_vect = [5, 4, 6, 20] # normal forward, capture on diagonals, forward 2 squares (for en passant calculation)
 
 class EPPawn(Pawn): #used for calculating en passant
-    name = "@"
+    short_name = "@"
+    name = "EPPawn"
     legal_vect = []
     real_pawn = None # if this pawn dies, real pawn dies too
         
