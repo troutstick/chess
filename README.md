@@ -61,6 +61,8 @@ White makes a move!
 ### To-do
 * Add move history
 
+* Add pawn promotion
+
 * Add castling
 
 * Add check, 50mr, checkmate, stalemate, 3fold
