@@ -22,9 +22,9 @@ class Player:
         has_moved = False
         while not has_moved:
             try:
-                self.board.list_pieces(self.is_white)
+                self.board.list_pieces(self.is_white, self.board.ranks)
                 self.display_board()
-                all_legal_moves = self.board.all_moves(self.is_white)
+                all_legal_moves = self.board.all_moves(self.is_white, self.board.ranks)
                 piece_dict = board.Piece.piece_dict
                 available_piece_names = set()
                 for piece_list in all_legal_moves:

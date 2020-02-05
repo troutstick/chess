@@ -264,21 +264,24 @@ class Chessboard:
     step = how far the piece moves.
     """
 
-    def list_pieces(self, is_white):
-        """Returns a list of pieces for a player."""
+    def same_side(self, piece1, piece2):
+        """Checks if two pieces are both owned by same side."""
+        return piece1.is_white == piece2.is_white
+
+    def list_pieces(self, is_white, ranks):
+        """Returns a list of pieces for a player, given a board state."""
         pieces = []
-        for rank in self.ranks:
+        for rank in ranks:
             for piece in rank:
                 if piece and is_white == piece.is_white: # if piece is owned by your side
                     pieces.append(piece)
         return pieces
 
-    def same_side(self, piece1, piece2):
-        return piece1.is_white == piece2.is_white
-
     def legal_moves(self, this_piece):
-        """Returns a list of valid moves for a piece."""
+        """Returns a list of valid moves for a piece.
         
+        WARNING: This function does NOT account for checks/checkmates/related.
+        """
         def legal_pawn_moves(this_piece):
             """En passant. Among other things. Ew."""
             valid_moves = []
@@ -332,18 +335,18 @@ class Chessboard:
                     step += 1
             return valid_moves
 
-    def all_moves(self, is_white):
-        """List all legal moves for a player."""
+    def all_moves(self, is_white, ranks):
+        """List all legal moves for a player from a board state."""
         moves = []
-        for piece in self.list_pieces(is_white):
+        for piece in self.list_pieces(is_white, ranks):
             moves.append([piece] + self.legal_moves(piece))
         return moves
 
     def in_check(self, ranks, is_white):
         """Given a board state, this function returns True if a player is in check and False otherwise."""
         current_board = self.ranks
-        for file_ in ranks:
-            for piece in file_:
+        for rank in ranks:
+            for piece in rank:
                 pass
         pass
 
