@@ -34,6 +34,30 @@ anyways, this is basically the next stockfish
 2|(P)(P)(P) -  - (P)(P)(P)|
 1|(R)(N)(B)(Q)(K)(B) - (R)|
 ```
+
+
+### Sample QGD gameplay:
+```
+White to move.
+1. King | 2. Queen | 4. Bishop | 5. Knight | 0. Pawn |
+Please enter a number to select what kind of piece you want to move: 5
+0. Go back. | 1. Knight at b1 | 2. Knight at g1 | 
+Please enter a number to select a piece to move: 1
+0. Go back. | 1. Nc3 | 2. Nd2 | 3. Na3 | 
+Enter the move you want to make: 1
+Enter 1 to confirm your move. 0 to go back: 1
+White makes a move!
+  _a__b__c__d__e__f__g__h_
+8| R  N  B  Q  K  B  N  R |
+7| P  P  P  -  -  P  P  P |
+6| -  -  -  -  P  -  -  - |
+5| -  -  -  P  -  -  -  - |
+4| -  - (P)(P) -  -  -  - |
+3| -  - (N) -  -  -  -  - |
+2|(P)(P) -  - (P)(P)(P)(P)|
+1|(R) - (B)(Q)(K)(B)(N)(R)|
+```
+
 ### To-do
 * Add move history
 
