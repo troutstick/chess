@@ -46,10 +46,10 @@ class Chessboard:
     def __init__(self, num_ranks=8, num_files=8):
         self.ranks = []
         for f in range(num_files):
-            file = []
+            file_ = []
             for r in range(num_ranks):
-                file.append(None)
-            self.ranks.append(file)
+                file_.append(None)
+            self.ranks.append(file_)
         self.board_setup()
         self.white = players.Player(self, True) # create the white player
         self.black = players.Player(self, False)
@@ -338,6 +338,14 @@ class Chessboard:
         for piece in self.list_pieces(is_white):
             moves.append([piece] + self.legal_moves(piece))
         return moves
+
+    def in_check(self, ranks, is_white):
+        """Given a board state, this function returns True if a player is in check and False otherwise."""
+        current_board = self.ranks
+        for file_ in ranks:
+            for piece in file_:
+                pass
+        pass
 
 class Piece:
     """Kings. Queens. Many other pieces. Woo!"""
