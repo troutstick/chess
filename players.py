@@ -45,7 +45,7 @@ class Player:
                             raise IndexError('invalid num')
                         else:
                             break
-                    except IndexError or ValueError:
+                    except (IndexError, ValueError):
                         print("Invalid input. Please move a piece with a legal move.")
                 selected_name = piece_dict.get(input_num)
 
@@ -68,7 +68,7 @@ class Player:
                             if input_num >= key_num or input_num < 0:
                                 raise IndexError
                             break
-                        except ValueError or IndexError:
+                        except (ValueError, IndexError):
                             print(
                                 f"Invalid input. Please enter a number from 1 through {key_num-1}.")
                 else:
