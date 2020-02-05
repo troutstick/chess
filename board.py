@@ -305,7 +305,12 @@ class Chessboard:
                         pass
                 
                 if not this_piece.has_moved:
-                    valid_moves.append((twice_forward, 1))
+                    target_piece = self.vect_select(
+                        this_piece.file_pos, this_piece.rank_pos, forward)
+                    target_piece2 = self.vect_select(
+                        this_piece.file_pos, this_piece.rank_pos, twice_forward)
+                    if (not target_piece) and (not target_piece2): #if both squares in front are empty
+                        valid_moves.append((twice_forward, 1))
 
             return valid_moves
 
