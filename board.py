@@ -1,4 +1,5 @@
 import players
+import copy
 
 class Chessboard:
     """Where action in the game takes place. As of now, it's probably best to stick to normal chess rules.
@@ -58,7 +59,7 @@ class Chessboard:
     def __repr__(self):
         """With self.ranks as input, print out the board (can only do from white's perspective as of now)."""
 
-        display_eppawn = False
+        display_eppawn = False # if True, show the virtual en passant pawns on the board
         light_sq_str = " - "
         dark_sq_str = " - "
 
@@ -341,7 +342,7 @@ class Chessboard:
             return valid_moves
 
     def all_moves(self, is_white, ranks):
-        """List all legal moves for a player from a board state."""
+        """List all legal moves for a player from a board state. Does NOT account for check."""
         moves = []
         for piece in self.list_pieces(is_white, ranks):
             moves.append([piece] + self.legal_moves(piece))
@@ -349,11 +350,33 @@ class Chessboard:
 
     def in_check(self, ranks, is_white):
         """Given a board state, this function returns True if a player is in check and False otherwise."""
-        current_board = self.ranks
-        for rank in ranks:
-            for piece in rank:
-                pass
-        pass
+        current_board = copy.deepcopy(self.ranks)
+        moves = self.all_moves(is_white, current_board)
+        print(moves)
+        for piece_move_list in moves:
+            if len(piece_move_list) > 1:
+                piece = piece_move_list[0]
+                move_vectors = piece_move_list[1:]
+                for vect in move_vectors:
+                    dir = vect[0]
+                    step = vect[1]
+                    self.move_piece(piece.file_pos, piece.rank_pos, dir, step)
+                    new_ranks = copy.deepcopy(self.ranks)
+                    self.ranks = current_board
+                    print(current_board)
+                    if not self.both_kings_alive(new_ranks):
+                        return True
+        return False
+
+    def both_kings_alive(self, ranks):
+        """Return True if ranks contains 2 kings."""
+        all_pieces = self.list_pieces(
+            True, ranks) + self.list_pieces(False, ranks)
+        num_kings = 0
+        for piece in all_pieces:
+            if isinstance(piece, King):
+                num_kings += 1
+        return num_kings == 2
 
 class Piece:
     """Kings. Queens. Many other pieces. Woo!"""

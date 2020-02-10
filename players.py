@@ -72,7 +72,7 @@ class Player:
                             print(
                                 f"Invalid input. Please enter a number from 1 through {key_num-1}.")
                 else:
-                    input_num = 1 #skip loop if there's only one of a piece i.e. don't waste time selecting which king you want
+                    input_num = 1 #skip loop if there's only one of a piece e.g. don't waste time selecting which king you want
 
                 piece_move_list = select_dict.get(input_num)
                 selected_piece = piece_move_list[0]
