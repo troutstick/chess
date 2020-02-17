@@ -364,11 +364,11 @@ class Chessboard:
 
     def in_check(self, ranks, is_white):
         """Given a board state, this function returns True if a player is in check and False otherwise."""
+        ans = False
         current_board = self.rank_copy(self.ranks)
-        moves = self.all_moves(is_white, current_board)
-        print(moves)
-        print('aaa')
-        print(current_board)
+        hypothetical = self.rank_copy(ranks)
+        self.ranks = ranks
+        moves = self.all_moves(not is_white, ranks) # checks all opponent's moves
         for piece_move_list in moves:
             if len(piece_move_list) > 1: # if piece has legal moves
                 piece = piece_move_list[0]
@@ -378,12 +378,11 @@ class Chessboard:
                     step = vect[1]
                     self.move_piece(piece.file_pos, piece.rank_pos, direction, step)
                     new_ranks = self.rank_copy(self.ranks)
-                    self.ranks = self.rank_copy(current_board)
-                    print(current_board)
-                    print('hi')
+                    self.ranks = self.rank_copy(hypothetical)
                     if not self.both_kings_alive(new_ranks):
-                        return True
-        return False
+                        ans = True
+        self.ranks = current_board
+        return ans
 
     def both_kings_alive(self, ranks):
         """Return True if ranks contains 2 kings."""
