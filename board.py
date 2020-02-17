@@ -362,6 +362,32 @@ class Chessboard:
             moves.append([piece] + self.legal_moves(piece))
         return moves
 
+    def all_moves_check(self, is_white, ranks):
+        """List all legal moves for a player from a board state. Accounts for checks
+        by pruning all moves from move list which still result in checks.
+        """
+        moves = self.all_moves(is_white, ranks)
+        curr_ranks = self.rank_copy(self.ranks)
+        hypothetical = self.rank_copy(ranks)
+        self.ranks = ranks
+
+        # checks all opponent's moves
+        for piece_move_list in moves:
+            if len(piece_move_list) > 1:  # if piece has legal moves
+                piece = piece_move_list[0]
+                move_vectors = piece_move_list[1:]
+                for vect in move_vectors:  # try all moves
+                    direction = vect[0]
+                    step = vect[1]
+                    self.move_piece(
+                        piece.file_pos, piece.rank_pos, direction, step)
+                    if not self.both_kings_alive(self.ranks):
+                        piece_move_list.remove(vect)
+                    self.ranks = hypothetical
+        self.ranks = curr_ranks
+        return moves
+                    
+
     def in_check(self, ranks, is_white):
         """Given a board state, this function returns True if a player is in check and False otherwise."""
         ans = False
