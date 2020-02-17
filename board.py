@@ -87,6 +87,20 @@ class Chessboard:
             print_rank(rank_index)
         return ""
 
+    def rank_copy(self):
+        """Return a copy of this board's ranks."""
+        rank_copy = []
+        rank_index = 0
+        for rank in self.ranks:
+            rank_copy.append([])
+            for piece in rank:
+                if piece != None:
+                    rank_copy[rank_index].append(piece.make_copy())
+                else:
+                    rank_copy[rank_index].append(None)
+            rank_index += 1
+        return rank_copy
+
     def move_notation(self, piece, move_vector):
         """Given a piece and its move vector (consisting of direction and step),
         print move notation i.e. Qxh4.
@@ -350,20 +364,23 @@ class Chessboard:
 
     def in_check(self, ranks, is_white):
         """Given a board state, this function returns True if a player is in check and False otherwise."""
-        current_board = copy.deepcopy(self.ranks)
+        current_board = self.rank_copy()
         moves = self.all_moves(is_white, current_board)
         print(moves)
+        print('aaa')
+        print(current_board)
         for piece_move_list in moves:
-            if len(piece_move_list) > 1:
+            if len(piece_move_list) > 1: # if piece has legal moves
                 piece = piece_move_list[0]
                 move_vectors = piece_move_list[1:]
-                for vect in move_vectors:
-                    dir = vect[0]
+                for vect in move_vectors: # try all moves
+                    direction = vect[0]
                     step = vect[1]
-                    self.move_piece(piece.file_pos, piece.rank_pos, dir, step)
-                    new_ranks = copy.deepcopy(self.ranks)
+                    self.move_piece(piece.file_pos, piece.rank_pos, direction, step)
+                    new_ranks = self.rank_copy()
                     self.ranks = current_board
                     print(current_board)
+                    print('hi')
                     if not self.both_kings_alive(new_ranks):
                         return True
         return False
@@ -376,6 +393,7 @@ class Chessboard:
         for piece in all_pieces:
             if isinstance(piece, King):
                 num_kings += 1
+        assert num_kings <= 2, "there can't be more than 2 kings"
         return num_kings == 2
 
 class Piece:
@@ -400,6 +418,11 @@ class Piece:
 
     def __repr__(self):
         return self.name + " at " + self.pos
+
+    def make_copy(self):
+        """Return an exact copy of this piece."""
+        new_piece = type(self)(self.is_white, self.file_pos, self.rank_pos, self.has_moved)
+        return new_piece
 
 class King(Piece):
     short_name = "K"
