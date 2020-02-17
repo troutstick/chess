@@ -87,11 +87,11 @@ class Chessboard:
             print_rank(rank_index)
         return ""
 
-    def rank_copy(self):
-        """Return a copy of this board's ranks."""
+    def rank_copy(self, ranks):
+        """Return a copy of RANKS."""
         rank_copy = []
         rank_index = 0
-        for rank in self.ranks:
+        for rank in ranks:
             rank_copy.append([])
             for piece in rank:
                 if piece != None:
@@ -364,7 +364,7 @@ class Chessboard:
 
     def in_check(self, ranks, is_white):
         """Given a board state, this function returns True if a player is in check and False otherwise."""
-        current_board = self.rank_copy()
+        current_board = self.rank_copy(self.ranks)
         moves = self.all_moves(is_white, current_board)
         print(moves)
         print('aaa')
@@ -377,8 +377,8 @@ class Chessboard:
                     direction = vect[0]
                     step = vect[1]
                     self.move_piece(piece.file_pos, piece.rank_pos, direction, step)
-                    new_ranks = self.rank_copy()
-                    self.ranks = current_board
+                    new_ranks = self.rank_copy(self.ranks)
+                    self.ranks = self.rank_copy(current_board)
                     print(current_board)
                     print('hi')
                     if not self.both_kings_alive(new_ranks):
